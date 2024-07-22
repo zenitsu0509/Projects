@@ -1,0 +1,43 @@
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.1'  # Match the Python version in your environment.yml
+
+      - name: Install Conda
+        run: |
+          wget -qO- https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh | bash
+          source ~/miniconda3/bin/activate
+          conda init bash
+          conda config --set always_yes yes --set changeps1 no
+          conda info -a
+
+      - name: Setup environment using Conda
+        run: |
+          source ~/miniconda3/bin/activate
+          conda env create -f environment.yml
+          conda activate your-env-name  # Replace with your environment name
+
+      - name: Run tests
+        run: |
+          source ~/miniconda3/bin/activate
+          conda activate myenv  # Replace with your environment name
+          pytest  # Adjust this command based on your testing framework
