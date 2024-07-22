@@ -1,4 +1,4 @@
-# .github/workflows/ci.yml using
+# .github/workflows/ci.yml
 name: CI
 
 on:
@@ -20,25 +20,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.12.1'  # Match the Python version in your environment.yml
+          python-version: '3.12'  # Match the Python version in your environment.yml
 
-      - name: Install Conda
+      - name: Install Miniconda
         run: |
-          wget -qO- https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh | bash
-          bash ~/miniconda3/bin/activate
-          conda init bash
-          conda config --set always_yes yes --set changeps1 no
-          conda info -a
+          wget -qO- https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh | bash -b -p ~/miniconda
+          echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+          ~/miniconda/bin/conda init bash
 
       - name: Setup environment using Conda
+        shell: bash -l {0}
         run: |
-          bash ~/miniconda3/bin/activate
           conda env create -f environment.yml
-          conda activate your-env-name  # Replace with your environment name
-
+          conda activate myenv  # Replace 'myenv' with the name of your environment
 
       - name: Run tests
+        shell: bash -l {0}
         run: |
-          bash ~/miniconda3/bin/activate
-          conda activate myenv  # Replace with your environment name
+          conda activate myenv  # Replace 'myenv' with the name of your environment
           pytest  # Adjust this command based on your testing framework
