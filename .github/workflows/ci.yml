@@ -17,25 +17,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12'  # Match the Python version in your environment.yml
-
       - name: Install Miniconda
         run: |
-          wget -qO- https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh | bash -b -p ~/miniconda
+          wget -qO- https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh | bash -b -p $HOME/miniconda
           echo "$HOME/miniconda/bin" >> $GITHUB_PATH
-          ~/miniconda/bin/conda init bash
+          $HOME/miniconda/bin/conda init bash
+        shell: bash -l {0}
 
       - name: Setup environment using Conda
-        shell: bash -l {0}
         run: |
+          source $HOME/.bashrc
           conda env create -f environment.yml
           conda activate myenv  # Replace 'myenv' with the name of your environment
+        shell: bash -l {0}
 
       - name: Run tests
-        shell: bash -l {0}
         run: |
+          source $HOME/.bashrc
           conda activate myenv  # Replace 'myenv' with the name of your environment
           pytest  # Adjust this command based on your testing framework
+        shell: bash -l {0}
