@@ -1,0 +1,2 @@
+Hay! Everyone this repo I dedicats for my Machine Learning and Deep Learning Project.<br> This project are not totally mine I had tooked the help from GitHub and others souces I have tried to improved them and also added my touch to them.
+Hope you likes my project you can suggest me the changes and also can teach me how I can make them more accurate and Better I am always ready learning new things.
