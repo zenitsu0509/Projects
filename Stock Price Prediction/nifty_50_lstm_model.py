@@ -6,9 +6,10 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense,Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow import keras
+from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
 df = pd.read_csv("/content/nifty50 data.csv")
-data = df
 
 df.dropna(inplace = True)
 
@@ -26,8 +27,8 @@ plt.title("Close Price Visualization")
 plt.plot(df['Close'])
 plt.plot(moving_100, 'r')
 
-train = pd.DataFrame(data[0:int(len(data)*0.70)])
-test = pd.DataFrame(data[int(len(data)*0.70): int(len(data))])
+train = df[0:int(len(df)*0.70)]
+test = df[int(len(df)*0.70):]
 
 print(train.shape)
 print(test.shape)
@@ -84,35 +85,41 @@ print("Infinite in train_scaled:", np.isinf(x_train).sum())
 print("NaN in test_scaled:", np.isnan(x_test).sum())
 print("Infinite in test_scaled:", np.isinf(x_test).sum())
 
-model.compile(optimizer = 'adam', loss = 'mean_squared_error', metrics = ['MAE'])
-model.fit(x_train, y_train, validation_data = (x_test, y_test) ,epochs = 50)
+model.compile(optimizer='Adam', loss='mean_squared_error', metrics=['MAE'])
+
+early_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)
+lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-5)
+
+model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=50, batch_size=32) #, callbacks=[early_stopping, lr_scheduler]
 
 import tensorflow as tf
 tf.keras.models.save_model(model, 'my_model.keras')
 
-past_100_days = pd.DataFrame(train_close[-100:])
+past_100_days = train_close[-100:]
 
-test_df = pd.DataFrame(test_close)
-
-import pandas as pd
-final_df = pd.concat([past_100_days, test_df], ignore_index=True)
+final_df = pd.concat([pd.DataFrame(past_100_days), pd.DataFrame(test_close)], ignore_index=True)
 
 input_data = scaler.fit_transform(final_df)
-input_data
+x_final_test = [input_data[i-100:i] for i in range(100, input_data.shape[0])]
+x_final_test = np.array(x_final_test)
 
-y_pred = model.predict(x_test)
+y_pred = model.predict(x_final_test)
 
 scale_factor = 1/0.00985902
 y_pred = y_pred * scale_factor
 y_test = y_test * scale_factor
 
-plt.figure(figsize = (12,6))
-plt.plot(y_test, 'b', label = "Original Price")
-plt.plot(y_pred, 'r', label = "Predicted Price")
+plt.figure(figsize=(12,6))
+plt.plot(y_test, 'b', label="Original Price")
+plt.plot(y_pred, 'r', label="Predicted Price")
 plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
 plt.show()
+
+y_test = test['Close'].values
+
+y_pred = y_pred.reshape(-1)
 
 from sklearn.metrics import mean_absolute_error
 mae = mean_absolute_error(y_test, y_pred)
