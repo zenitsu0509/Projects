@@ -49,7 +49,7 @@ def create_features(df):
     return df
 
 df = create_features(df)
-df
+
 
 fig,ax = plt.subplots(figsize = (12,8))
 sns.boxplot(data = df,x='hour',y='AEP_MW')
