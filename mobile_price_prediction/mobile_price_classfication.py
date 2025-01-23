@@ -5,10 +5,11 @@ import seaborn as sns
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense,Dropout,BatchNormalization
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+# to downlaod dataset
+# !kaggle datasets download -d iabhishekofficial/mobile-price-classification
 
-!kaggle datasets download -d iabhishekofficial/mobile-price-classification
-
-!unzip /content/mobile-price-classification.zip
+# !unzip /content/mobile-price-classification.zip
 
 test = pd.read_csv('/content/test.csv')
 train = pd.read_csv('/content/train.csv')
@@ -42,8 +43,6 @@ x1 = std.fit_transform(x1)
 y1.value_counts()
 
 pd.get_dummies(y1)
-
-from sklearn.model_selection import train_test_split
 
 x_train,x_test,y_train,y_test = train_test_split(x1,y1,test_size = 0.2,random_state = 42)
 
