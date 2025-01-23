@@ -22,8 +22,7 @@ df['Sex'].replace({'male':0, 'female':1}, inplace=True)
 df  = df.drop(['Name','PassengerId','Ticket','Cabin'],axis = 1)
 
 df.isnull().any()
-
-df
+print(df)
 
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
