@@ -14,7 +14,7 @@ from tensorflow.keras.models import Sequential
 
 df = pd.read_csv("/content/spam.csv", encoding='latin-1')
 
-df.head()
+print(df.head())
 
 df_spam = df[df['v1']=='spam']
 df_spam = df_spam[['v1','v2']]
